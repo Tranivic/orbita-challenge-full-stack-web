@@ -49,4 +49,17 @@ export const studentController = {
             return res.status(500).json({ status: "error", message: error.message });
         }
     },
+    async listStudents(req, res) {
+        const valid_params = ['ra', 'cpf', 'name'];
+        const query = req.query;
+        try {
+            if (Object.keys(query).some(key => !valid_params.includes(key))) {
+                return res.status(200).json({ status: "error", message: 'Invalid query search parameter' });
+            }
+            const students = await studentModel.listStudents(query);
+            return res.status(200).json({ status: "success", data: students });
+        } catch (error) {
+            return res.status(500).json({ status: "error", message: error.message });
+        }
+    }
 };
