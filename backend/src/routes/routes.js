@@ -14,9 +14,9 @@ import { studentController } from "../controllers/student.js";
 const router = express.Router();
 
 router.get("/students", limiter, studentController.listStudents);
-router.post("/students", upload.none(), studentController.createStudent);
-// router.put("/students/:id",  upload.none(), studentController.updateStudent);
-// router.delete("/students/:id", studentController.deleteStudent);
+router.post("/students",limiter, upload.none(), studentController.createStudent);
+router.put("/students/:id",limiter,  upload.none(), studentController.updateStudent);
+router.delete("/students/:id",limiter, studentController.deleteStudent);
 
 
 export default router;

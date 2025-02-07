@@ -26,6 +26,17 @@ export const studentModel = {
                 [field]: value
             }
         });
+    },
+    async updateStudent(id, studentData) {
+        return prisma.student.update({
+            where: { ra: id },
+            data: studentData
+        });
+    },
+    deleteStudent(id) {
+        return prisma.student.delete({
+            where: { ra: id }
+        });
     }
 
 };

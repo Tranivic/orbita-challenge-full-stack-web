@@ -61,5 +61,59 @@ export const studentController = {
         } catch (error) {
             return res.status(500).json({ status: "error", message: error.message });
         }
+    },
+    async updateStudent(req, res) {
+        try {
+            const { id } = req.params;
+            const { name, email } = req.body;
+
+            if (!name || !email || !id) {
+                return res.status(200).json({ status: "error", message: 'Missing parameters', data: req.body, id });
+            }
+
+            if (!validator.isEmail(email)) {
+                return res.status(200).json({ status: "error", message: 'Invalid email' });
+            }
+
+            if (!validator.isInt(id) || id.length > 11) {
+                return res.status(200).json({ status: "error", message: 'Invalid RA' });
+            }
+
+            if (!/^[a-zA-Z ,.'-]+$/.test(name)) {
+                return res.status(200).json({ status: "error", message: 'Invalid name' });
+            }
+
+
+            const existingData = await Promise.all([
+                studentModel.findStudentBy('ra', id),
+            ]);
+
+            if (!existingData[0]) {
+                return res.status(200).json({
+                    status: "error",
+                    message: `Student with this RA does not exist`
+                });
+            }
+
+            await studentModel.updateStudent(id, req.body);
+            return res.status(201).json({ status: "success", message: 'User updated successfully' });
+
+        } catch (error) {
+            return res.status(500).json({ status: "error", message: error.message });
+        }
+    },
+    deleteStudent(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                return res.status(200).json({ status: "error", message: 'Missing parameters' });
+            }
+            studentModel.deleteStudent(id);
+            return res.status(201).json({ status: "success", message: 'User deleted successfully' });
+        } catch (error) {
+            return res.status(500).json({
+                status: "error", message: error.message
+            });
+        }
     }
 };
