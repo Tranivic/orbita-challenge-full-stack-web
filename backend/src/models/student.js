@@ -18,7 +18,7 @@ export const studentModel = {
             take,
             skip
         });
-    return { students };
+        return students;
     },
     
     async countStudents(query = {}) {
