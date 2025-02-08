@@ -18,11 +18,7 @@ export const studentModel = {
             take,
             skip
         });
-
-        const total = await prisma.student.count({ where });
-        const totalPages = Math.ceil(total / take);
-
-        return { students, total, totalPages };
+    return { students };
     },
     
     async countStudents(query = {}) {
