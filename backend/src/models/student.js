@@ -33,7 +33,7 @@ export const studentModel = {
             data: studentData
         });
     },
-    deleteStudent(id) {
+    async deleteStudent(id) {
         return prisma.student.delete({
             where: { ra: id }
         });
