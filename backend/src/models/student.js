@@ -4,14 +4,37 @@ const prisma = new PrismaClient();
 export const studentModel = {
 
     async listStudents(query = {}) {
-        const { ra, cpf, name, limit = 10 } = query;
+        const { ra, cpf, name, limit = 10, page = 1 } = query;
         const where = {};
         if (ra) where.ra = ra;
         if (cpf) where.cpf = cpf;
         if (name) where.name = { contains: name };
-        return prisma.student.findMany({ where, take: parseInt(limit) });
+
+        const take = parseInt(limit);
+        const skip = (parseInt(page) - 1) * take;
+
+        const students = await prisma.student.findMany({
+            where,
+            take,
+            skip
+        });
+
+        const total = await prisma.student.count({ where });
+        const totalPages = Math.ceil(total / take);
+
+        return { students, total, totalPages };
     },
     
+    async countStudents(query = {}) {
+        const { ra, cpf, name } = query;
+
+        const where = {};
+        if (ra) where.ra = ra;
+        if (cpf) where.cpf = cpf;
+        if (name) where.name = { contains: name };
+
+        return prisma.student.count({ where });
+    },
 
     async createStudent(studentData) {
         return prisma.student.create({ data: studentData });

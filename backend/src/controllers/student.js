@@ -50,20 +50,42 @@ export const studentController = {
         }
     },
     async listStudents(req, res) {
-        const valid_params = ['ra', 'cpf', 'name', 'limit'];
+        const valid_params = ['ra', 'cpf', 'name', 'limit', 'page'];
         const query = req.query;
         try {
             if (Object.keys(query).some(key => !valid_params.includes(key))) {
                 return res.status(200).json({ status: "error", message: 'Invalid query search parameter' });
             }
-            if(query.limit && !validator.isInt(query.limit)){
-                return res.status(200).json({ status: "error", message: 'Invalid limit' });
+
+            if(query.limit) {
+                if (!validator.isInt(query.limit)) {
+                    return res.status(200).json({ status: "error", message: 'Invalid query limit' });
+                }
+                if (query.limit > 100) {
+                    return res.status(200).json({ status: "error", message: 'Query limit too high' });
+                }
             }
-            if(query.limit && query.limit > 100){
-                return res.status(200).json({ status: "error", message: 'Limit is too high' });
+
+            if(query.page && !validator.isInt(query.page, { min: 1 })){
+                return res.status(200).json({ status: "error", message: 'Invalid page number' });
             }
-            const students = await studentModel.listStudents(query);
-            return res.status(200).json({ status: "success", data: students });
+
+            const limit = query.limit ? parseInt(query.limit) : 10;
+            const page = query.page ? parseInt(query.page) : 1;
+            const offset = (page - 1) * limit;
+
+            const students = await studentModel.listStudents(query, limit, offset);
+            const totalStudents = await studentModel.countStudents(query);
+            const totalPages = Math.ceil(totalStudents / limit);
+
+            return res.status(200).json({
+                status: "success",
+                page,
+                limit,
+                total: totalStudents,
+                totalPages,
+                data: students
+            });
         } catch (error) {
             return res.status(500).json({ status: "error", message: error.message });
         }
