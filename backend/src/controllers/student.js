@@ -102,13 +102,19 @@ export const studentController = {
             return res.status(500).json({ status: "error", message: error.message });
         }
     },
-    deleteStudent(req, res) {
+    async deleteStudent(req, res) {
         try {
             const { id } = req.params;
             if (!id) {
                 return res.status(200).json({ status: "error", message: 'Missing parameters' });
             }
-            studentModel.deleteStudent(id);
+
+            const existingStudent = await studentModel.findStudentBy('ra', id);
+            if (!existingStudent) {
+                return res.status(200).json({ status: "error", message: 'Student does not exist' });
+            }
+
+            await studentModel.deleteStudent(id);
             return res.status(201).json({ status: "success", message: 'User deleted successfully' });
         } catch (error) {
             return res.status(500).json({
