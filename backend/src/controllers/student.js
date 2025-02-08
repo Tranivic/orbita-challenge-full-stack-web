@@ -50,11 +50,17 @@ export const studentController = {
         }
     },
     async listStudents(req, res) {
-        const valid_params = ['ra', 'cpf', 'name'];
+        const valid_params = ['ra', 'cpf', 'name', 'limit'];
         const query = req.query;
         try {
             if (Object.keys(query).some(key => !valid_params.includes(key))) {
                 return res.status(200).json({ status: "error", message: 'Invalid query search parameter' });
+            }
+            if(query.limit && !validator.isInt(query.limit)){
+                return res.status(200).json({ status: "error", message: 'Invalid limit' });
+            }
+            if(query.limit && query.limit > 100){
+                return res.status(200).json({ status: "error", message: 'Limit is too high' });
             }
             const students = await studentModel.listStudents(query);
             return res.status(200).json({ status: "success", data: students });

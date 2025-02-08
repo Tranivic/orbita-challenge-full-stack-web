@@ -4,12 +4,12 @@ const prisma = new PrismaClient();
 export const studentModel = {
 
     async listStudents(query = {}) {
-        const { ra, cpf, name } = query;
+        const { ra, cpf, name, limit = 10 } = query;
         const where = {};
         if (ra) where.ra = ra;
         if (cpf) where.cpf = cpf;
         if (name) where.name = { contains: name };
-        return prisma.student.findMany({ where });
+        return prisma.student.findMany({ where, take: parseInt(limit) });
     },
     
 
