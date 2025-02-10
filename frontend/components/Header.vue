@@ -8,7 +8,7 @@
         <v-navigation-drawer location="left" v-model="drawer" temporary>
             <v-list>
                 <nuxt-link v-for="(item, i) in items" :key="i" :to="item.link">
-                    <v-list-item :value="item" :active="(route.path === item.link) || (route.path === item.alias)" active-color="primary">
+                    <v-list-item :value="item" :active="(route.path === item.link) || (route.path === item.alias)" color="primary">
                         <template v-slot:prepend>
                             <v-icon :icon="item.icon"></v-icon>
                         </template>
