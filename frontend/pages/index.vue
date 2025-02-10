@@ -1,6 +1,7 @@
 <template>
     <NuxtLayout>
         <main class="page h-100">
+            <StudentsList/>
         </main>
     </NuxtLayout>
 </template> 
