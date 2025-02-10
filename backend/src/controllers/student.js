@@ -50,7 +50,8 @@ export const studentController = {
         }
     },
     async listStudents(req, res) {
-        const valid_params = ['ra', 'cpf', 'name', 'limit', 'page'];
+        const valid_params = ['ra', 'cpf', 'name', 'email', 'limit', 'page', 'sort'];
+        const valid_sort_fields = ['ra', 'name', 'cpf', 'email'];
         const query = req.query;
         try {
             if (Object.keys(query).some(key => !valid_params.includes(key))) {
@@ -70,11 +71,27 @@ export const studentController = {
                 return res.status(200).json({ status: "error", message: 'Invalid page number' });
             }
 
+            let sortField = 'name';
+            let sortOrder = 'ASC';
+
+            if (query.sort) {
+                const sortParts = query.sort.split(' ');
+                const field = sortParts[0].replace('-', '');
+                const order = sortParts[0].startsWith('-') ? 'DESC' : 'ASC';
+
+                if (valid_sort_fields.includes(field)) {
+                    sortField = field;
+                    sortOrder = order;
+                } else {
+                    return res.status(200).json({ status: "error", message: 'Invalid sort field' });
+                }
+            }
+
             const limit = query.limit ? parseInt(query.limit) : 10;
             const page = query.page ? parseInt(query.page) : 1;
             const offset = (page - 1) * limit;
 
-            const students = await studentModel.listStudents(query, limit, offset);
+            const students = await studentModel.listStudents(query, limit, offset, sortField, sortOrder);
             const totalStudents = await studentModel.countStudents(query);
             const totalPages = Math.ceil(totalStudents / limit);
 

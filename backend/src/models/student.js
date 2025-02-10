@@ -4,19 +4,26 @@ const prisma = new PrismaClient();
 export const studentModel = {
 
     async listStudents(query = {}) {
-        const { ra, cpf, name, limit = 10, page = 1 } = query;
+        const { ra, cpf, name, limit = 10, page = 1, sort } = query;
         const where = {};
         if (ra) where.ra = ra;
         if (cpf) where.cpf = cpf;
         if (name) where.name = { contains: name };
-
         const take = parseInt(limit);
         const skip = (parseInt(page) - 1) * take;
-
+    
+        let orderBy = { name: 'asc' };
+        if (sort) {
+            const field = sort.replace('-', '');
+            const order = sort.startsWith('-') ? 'desc' : 'asc';
+            orderBy = { [field]: order };
+        }
+    
         const students = await prisma.student.findMany({
             where,
             take,
-            skip
+            skip,
+            orderBy
         });
         return students;
     },
