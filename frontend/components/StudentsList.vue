@@ -9,7 +9,7 @@
             </v-container>
         </div>
         <div class="w-100 px-4 d-flex">
-            <v-data-table-server :search="search" disable-sort v-model:items-per-page="itemsPerPage" :items-per-page-options="[10, 25, 50, 100]" :headers="mobile? headers.filter(h => !h.hideOnMobile) : headers" :items="students" :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
+            <v-data-table-server :search="search" v-model:items-per-page="itemsPerPage" :items-per-page-options="[10, 25, 50, 100]" :headers="mobile._value && mobile? headers.filter(h => !h.hideOnMobile) : headers" :items="students" :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
                 <template v-slot:item.actions="{ item }">
                     <v-icon size="small" class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
                     <v-icon size="small" @click="() => { itemToDelete = item; dialog = true; }">mdi-delete</v-icon>
@@ -50,7 +50,7 @@
     const search = ref("");
     const { data } = await useAsyncData(() => $fetch(api + '/students'));
     const { mobile } = useDisplay();
-
+    
     const fetchData = (query) => {
         return $fetch(api + '/students' + query);
     }
@@ -111,9 +111,14 @@
             return;
         }
         loading.value = true;
-        const { page, itemsPerPage } = event;
+        const { page, itemsPerPage, sortBy } = event;
         let query = `?page=${page}&limit=${itemsPerPage}`;
         if(search.value) query += `&${search_data.value.type}=${search.value}`;
+        if (sortBy && sortBy.length > 0) {
+            const { key, order } = sortBy[0]; // Assume apenas um campo de ordenação
+            const sortParam = order === 'desc' ? `-${key}` : key;
+            query += `&sort=${sortParam}`;
+        }
         const data = await fetchData(query);
         setStudentsValue(data.data);
         current_page.value = page;
