@@ -148,8 +148,6 @@
                     text: '',
                     type: '',
                 };
-                if(route.path === '/cadastro') return;
-                router.push('/');
             }, 3000);
         }
     });
