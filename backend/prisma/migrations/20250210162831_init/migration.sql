@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE `student` (
     `id` VARCHAR(191) NOT NULL,
-    `ra` VARCHAR(20) NOT NULL,
+    `ra` INTEGER UNSIGNED NOT NULL,
     `name` VARCHAR(45) NOT NULL DEFAULT '',
     `email` VARCHAR(45) NOT NULL,
     `cpf` VARCHAR(11) NOT NULL,

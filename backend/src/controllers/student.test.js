@@ -23,14 +23,14 @@ describe('Test students controller', () => {
 
     describe('Test student creation', () => {
         it('should return error if missing parameters', async () => {
-            req.body = { name: '', email: '', ra: '', cpf: '' };
+            req.body = { name: '', email: '', ra: null, cpf: '' };
             await studentController.createStudent(req, res);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({ status: "error", message: 'Missing parameters' });
         });
 
         it('should return error if email is invalid', async () => {
-            req.body = { name: 'John Doe', email: 'invalidEmail', ra: '123456', cpf: '12345678901' };
+            req.body = { name: 'John Doe', email: 'invalidEmail', ra: 123, cpf: '12345678901' };
             validator.isEmail.mockReturnValue(false);
             await studentController.createStudent(req, res);
             expect(res.status).toHaveBeenCalledWith(200);
@@ -47,7 +47,7 @@ describe('Test students controller', () => {
         });
 
         it('should return error if CPF format is invalid', async () => {
-            req.body = { name: 'John Doe', email: 'john@example.com', ra: '123456', cpf: 'invalidCPF' };
+            req.body = { name: 'John Doe', email: 'john@example.com', ra: 123, cpf: 'invalidCPF' };
             validator.isEmail.mockReturnValue(true);
             validator.isInt.mockReturnValue(true);
             await studentController.createStudent(req, res);
@@ -56,7 +56,7 @@ describe('Test students controller', () => {
         });
 
         it('should return error if name is invalid', async () => {
-            req.body = { name: 'Invalid@Name', email: 'john@example.com', ra: '123456', cpf: '12345678901' };
+            req.body = { name: 'Invalid@Name', email: 'john@example.com', ra: 123, cpf: '12345678901' };
             validator.isEmail.mockReturnValue(true);
             validator.isInt.mockReturnValue(true);
             await studentController.createStudent(req, res);
@@ -65,7 +65,7 @@ describe('Test students controller', () => {
         });
 
         it('should return error if student already exists', async () => {
-            req.body = { name: 'John Doe', email: 'john@example.com', ra: '123456', cpf: '12345678901' };
+            req.body = { name: 'John Doe', email: 'john@example.com', ra: 123, cpf: '12345678901' };
             validator.isEmail.mockReturnValue(true);
             validator.isInt.mockReturnValue(true);
             studentModel.findStudentBy.mockResolvedValueOnce(true);
@@ -75,7 +75,7 @@ describe('Test students controller', () => {
         });
 
         it('should create student successfully', async () => {
-            req.body = { name: 'John Doe', email: 'john@example.com', ra: '123456', cpf: '12345678901' };
+            req.body = { name: 'John Doe', email: 'john@example.com', ra: 123, cpf: '12345678901' };
             validator.isEmail.mockReturnValue(true);
             validator.isInt.mockReturnValue(true);
             studentModel.findStudentBy.mockResolvedValueOnce(false);
@@ -121,7 +121,7 @@ describe('Test students controller', () => {
         it('should return students successfully with pagination', async () => {
             req.query = { limit: '10', page: '1' };
             validator.isInt.mockReturnValue(true);
-            const students = [{ name: 'John Doe', ra: '123456', email: 'john@example.com', cpf: '12345678901' }];
+            const students = [{ name: 'John Doe', ra: 123, email: 'john@example.com', cpf: '12345678901' }];
             const totalStudents = 1;
             studentModel.listStudents.mockResolvedValueOnce(students);
             studentModel.countStudents.mockResolvedValueOnce(totalStudents);
@@ -139,7 +139,7 @@ describe('Test students controller', () => {
 
         it('should return students successfully without pagination', async () => {
             req.query = {};
-            const students = [{ name: 'John Doe', ra: '123456', email: 'john@example.com', cpf: '12345678901' }];
+            const students = [{ name: 'John Doe', ra: 123, email: 'john@example.com', cpf: '12345678901' }];
             const totalStudents = 1;
             studentModel.listStudents.mockResolvedValueOnce(students);
             studentModel.countStudents.mockResolvedValueOnce(totalStudents);

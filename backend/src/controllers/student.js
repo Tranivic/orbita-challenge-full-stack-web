@@ -4,8 +4,7 @@ import validator from "validator";
 export const studentController = {
     async createStudent(req, res) {
         try {
-            const { name, email, ra, cpf } = req.body;
-
+            let { name, email, ra, cpf } = req.body;
             if (!name || !email || !ra || !cpf) {
                 return res.status(200).json({ status: "error", message: 'Missing parameters' });
             }
@@ -25,7 +24,7 @@ export const studentController = {
             if (!/^[a-zA-Z ,.'-]+$/.test(name)) {
                 return res.status(200).json({ status: "error", message: 'Invalid name' });
             }
-
+            ra = parseInt(ra);
             const existingData = await Promise.all([
                 studentModel.findStudentBy('ra', ra),
                 studentModel.findStudentBy('cpf', cpf),
@@ -42,7 +41,7 @@ export const studentController = {
                 });
             }
 
-            await studentModel.createStudent(req.body);
+            await studentModel.createStudent({ ra, cpf, name, email });
             return res.status(201).json({ status: "success", message: 'User created successfully' });
 
         } catch (error) {
@@ -53,6 +52,9 @@ export const studentController = {
         const valid_params = ['ra', 'cpf', 'name', 'email', 'limit', 'page', 'sort'];
         const valid_sort_fields = ['ra', 'name', 'cpf', 'email'];
         const query = req.query;
+        if(query.ra){
+            query.ra = parseInt(query.ra);
+        }
         try {
             if (Object.keys(query).some(key => !valid_params.includes(key))) {
                 return res.status(200).json({ status: "error", message: 'Invalid query search parameter' });
@@ -109,7 +111,7 @@ export const studentController = {
     },
     async updateStudent(req, res) {
         try {
-            const { id } = req.params;
+            let { id } = req.params;
             const { name, email } = req.body;
 
             if (!name || !email || !id) {
@@ -128,6 +130,7 @@ export const studentController = {
                 return res.status(200).json({ status: "error", message: 'Invalid name' });
             }
 
+            id = parseInt(id);
 
             const existingData = await Promise.all([
                 studentModel.findStudentBy('ra', id),
@@ -149,11 +152,11 @@ export const studentController = {
     },
     async deleteStudent(req, res) {
         try {
-            const { id } = req.params;
+            let { id } = req.params;
             if (!id) {
                 return res.status(200).json({ status: "error", message: 'Missing parameters' });
             }
-
+            id = parseInt(id);
             const existingStudent = await studentModel.findStudentBy('ra', id);
             if (!existingStudent) {
                 return res.status(200).json({ status: "error", message: 'Student does not exist' });

@@ -9,7 +9,7 @@ datasource db {
 
 model student {
     id    String @id @default(uuid())
-    ra    String @unique(map: "ra_UNIQUE") @db.VarChar(20)
+    ra    Int    @unique(map: "ra_UNIQUE") @db.UnsignedInt
     name  String @default("") @db.VarChar(45)
     email String @unique @db.VarChar(45)
     cpf   String @unique(map: "cpf_UNIQUE") @db.VarChar(11)
